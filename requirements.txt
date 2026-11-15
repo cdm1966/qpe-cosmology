@@ -1,0 +1,9 @@
+﻿"""Dependencies for the QPE verification package.
+
+Tested with
+    Python 3.12, numpy 2.4, scipy 1.17
+Older versions of numpy/scipy will almost certainly work, but the numbers in
+Chen (2026) were produced with the versions above.
+"""
+numpy>=1.24
+scipy>=1.10
