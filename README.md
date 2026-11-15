@@ -17,6 +17,7 @@ in a few seconds, and reproduce it from scratch in under twenty minutes.**
 
 ```bash
 pip install -r requirements.txt
+python get_data.py   # downloads the Pantheon+ catalogue (~0.6 MB)
 python verify.py --fast
 ```
 
