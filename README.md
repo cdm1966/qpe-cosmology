@@ -1,5 +1,7 @@
 # QPE cosmology: verification package
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24247908.svg)](https://doi.org/10.5281/zenodo.24247908)
+
 This repository contains the code that produces every number and table in
 
 > Chen, D.-M. 2026, *Cosmological Tests of Scale-Dependent Quantum Gravity:
