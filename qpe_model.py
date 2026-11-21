@@ -1,6 +1,7 @@
 """
 qpe_model.py --- Reference implementation of the QPE distance-redshift relation
-used in Chen (2026), "Cosmological Tests of Scale-Dependent Quantum Gravity".
+used in Chen (2026), "Cosmological Tests of Scale-Dependent Quantum Potential
+Energy".
 
 Everything in this module is a direct transcription of the equations of the
 paper; the equation numbers quoted in the comments refer to the published
