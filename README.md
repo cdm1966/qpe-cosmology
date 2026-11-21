@@ -163,14 +163,14 @@ MIT licence.
 If you use this code, please cite both the paper and the archived version:
 
 ```
-Chen, D.-M. (2026). QPE cosmology: verification package (v2.1)
-[Computer software]. Zenodo. https://doi.org/10.5281/zenodo.24247908
+Chen, D.-M. (2026). QPE cosmology: verification package [Computer software].
+Zenodo. https://doi.org/10.5281/zenodo.24247908
 ```
 
-That DOI is the *concept* DOI: it represents all versions and always resolves
-to the latest one (currently v2.1, doi:10.5281/zenodo.24410260). The archived
-versions are frozen; this repository is the living version and may receive
-updates that are not part of v2.1.
+That DOI is the *concept* DOI: it represents all versions of the package and
+always resolves to the latest one. The archived versions are frozen; this
+repository is the living version and may receive updates that are not part of
+any archived release.
 
 ## 8. The horizon cutoff
 

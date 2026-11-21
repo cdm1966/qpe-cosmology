@@ -189,7 +189,7 @@ def boltzmann_lcdm(z, H0=67.4, om=0.315):
 
 
 def bao_model(z, params=None):
-    """(D_M/r_d, D_H/r_d) of Eqs. (152)-(154)."""
+    """(D_M/r_d, D_H/r_d) of Eqs. (162)-(164)."""
     p = params or BAO_PARAMS
     x = x_of_z(z)
     KM = K_gamma(x, p["gamma_M"][0], p["gamma_M"][1], p["z_split"], p["width"])
@@ -316,7 +316,7 @@ def power_spectrum(k, p, cutoff=None):
 
 
 class CMBProjector:
-    """Two-branch projection of Eq. (156)-(150) on the Planck multipoles."""
+    """Two-branch projection of Eqs. (156)-(158) on the Planck multipoles."""
 
     def __init__(self, data_file, nu=900, nk=300, ell_subsample=3,
                  ell_max=2508.0, nx=4000, nproc=1):
