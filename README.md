@@ -67,7 +67,7 @@ Actual output of the third block:
 
 The CMB step builds a spherical-Bessel grid of size
 `836 multipoles x 300 wavenumbers x 900 radii` (about 1 GB in float32) and then
-evaluates the two-branch projection of Eqs. (149)-(150). This is the only
+evaluates the two-branch projection of Eqs. (156)-(158). This is the only
 expensive part, and it is recomputed from scratch.
 
 A cheaper sanity check, useful to confirm that the code runs:
@@ -113,13 +113,13 @@ text.
 | `x_of_z`, `z_of_x` | Eq. (76) | `1+z = 1/sqrt(1-2 sinh x)` |
 | `d_prop_of_z` | Eq. (79) | light-travel distance |
 | `C_of_z` | Eq. (86) | areal radius `C = (1+z)^(gamma-2) D_prop` |
-| `D_L_of_z`, `mu_of_z` | Eqs. (82), (85) | luminosity distance, distance modulus |
+| `D_L_of_z`, `mu_of_z` | Eqs. (89), (84) | luminosity distance, distance modulus |
 | `K_gamma` | Eq. (162) | cumulative path integral for radial BAO |
 | `sn_chi2` | Eq. (94) | SN Ia Hubble diagram |
-| `bao_model`, `bao_chi2` | Eqs. (152)-(154) | `D_M/r_d`, `D_H/r_d`, `D_V/r_d` |
+| `bao_model`, `bao_chi2` | Eqs. (162)-(164) | `D_M/r_d`, `D_H/r_d`, `D_V/r_d` |
 | `emission_kernel` | Eq. (148) | `W ~ u^(1-p/2) exp(-tau)` |
 | `power_spectrum` | Eq. (131) | three-segment `n(k)`, `cos^2(k/k_w)` modulation |
-| `CMBProjector` | Eqs. (149)-(150) | two-branch projection, `j_l(kC)` |
+| `CMBProjector` | Eqs. (156)-(158) | two-branch projection, `j_l(kC)` |
 | `cutoff_horizon` | Eq. (108) | `f(x) = 1-(x/x_h)^beta` |
 
 The published parameter values are collected at the top of the module in
@@ -163,12 +163,14 @@ MIT licence.
 If you use this code, please cite both the paper and the archived version:
 
 ```
-Chen, D.-M. (2026). QPE cosmology: verification package (v1.0)
+Chen, D.-M. (2026). QPE cosmology: verification package (v2.1)
 [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.24247908
 ```
 
-The archived version is frozen; this repository is the living version and may
-receive updates that are not part of v1.0.
+That DOI is the *concept* DOI: it represents all versions and always resolves
+to the latest one (currently v2.1, doi:10.5281/zenodo.24410260). The archived
+versions are frozen; this repository is the living version and may receive
+updates that are not part of v2.1.
 
 ## 8. The horizon cutoff
 
