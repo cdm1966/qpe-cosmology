@@ -31,7 +31,7 @@ PANTHEON_FILE = os.path.join(DATA, "Pantheon+SH0ES.dat")
 PAPER = {
     "sn_chi2": 745.6, "sn_chi2nu": 0.438,
     "bao_chi2": 8.0,
-    "cmb_chi2": 1464.7, "cmb_chi2nu": 1.752,
+    "cmb_chi2": 1464.5, "cmb_chi2nu": 1.752,
 }
 
 
@@ -90,7 +90,7 @@ def main():
         print("  this is the expensive step: ~1 GB of RAM and 5-15 min.")
         t0 = time.time()
         proj = qm.CMBProjector(PLANCK_FILE, nu=args.nu, nk=args.nk)
-        chi2, n = proj.chi2(qm.CMB_PARAMS)
+        chi2, n = proj.chi2(qm.CMB_PARAMS, cutoff=qm.cutoff_horizon)
         print("  computed in %.1f s" % (time.time() - t0))
         all_ok &= line("chi2", chi2, PAPER["cmb_chi2"], 1.0)
         all_ok &= line("chi2 / N", chi2 / n, PAPER["cmb_chi2nu"], 0.002)

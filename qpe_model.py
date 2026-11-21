@@ -16,25 +16,25 @@ The two ingredients are:
 
      with 1 + z = 1/g1.  The scale dependence is carried by the areal radius
 
-         C(r) = [1+z]^{gamma(z)-2} D_prop(z) ,                        Eq. (84)
+         C(r) = [1+z]^{gamma(z)-2} D_prop(z) ,                        Eq. (86)
 
      so that  D_A = C ,  D_L = (1+z)^gamma D_prop ,  D_M = (1+z)^{gamma-1} D_prop .
-     The exponent is three constant segments, Eq. (86),
+     The exponent is three constant segments, Eq. (90),
 
          gamma(z) = g1 + (g2-g1)/2 [1+tanh((z-z1)/dz1)]
                        + (g3-g2)/2 [1+tanh((z-z2)/dz2)] .
 
   2. CMB projection (Section 6).  The emission kernel is
 
-         W(x) ~ u^{1-p/2} exp[-tau(x)] ,   u = g1^2 ,                 Eq. (142)
+         W(x) ~ u^{1-p/2} exp[-tau(x)] ,   u = g1^2 ,                 Eq. (148)
 
      with  tau = tau2 * A(x)/A(x_*) ,  A = int u^{-(q+1)/2} dx  and x_* at z=2.
-     The angular power spectrum is Eq. (149),
+     The angular power spectrum is Eq. (156),
 
          C_l = (2/pi) int k^2 dk P(k) [ int_0^{Cmax} G(u) j_l(ku) du ]^2 ,
 
      where the change of variable u = C(r) is two-valued (C is not monotonic)
-     and G(u) sums the two branches, Eq. (150).
+     and G(u) sums the two branches, Eq. (158).
 
 A note on units: distances are in Mpc, H0 in km/s/Mpc, k in 1/Mpc.  Internally
 the projection uses dimensionless x = H0 r / c and k' = k c / H0.
@@ -51,10 +51,10 @@ from scipy.special import spherical_jn
 C_LIGHT = 299792.458                  # speed of light, km/s
 MAX_X = np.arcsinh(0.5)               # horizon, x_h = ln(phi) = 0.4812
 
-#: Three-segment exponent, Eq. (87) of the paper.
+#: Three-segment exponent, Eq. (91) of the paper.
 GAMMA_1, GAMMA_2, GAMMA_3 = 1.1886, 1.0912, 0.9409
 
-#: Transition redshifts and widths of Eq. (86).
+#: Transition redshifts and widths of Eq. (90).
 Z1, DZ1, Z2, DZ2 = 1.5, 0.10, 100.0, 15.0
 
 #: SN Ia fit (Section 4.2), chi2 = 745.6 for N = 1701.
@@ -64,14 +64,12 @@ SN_PARAMS = dict(H0=72.664, gamma1=1.1888, gamma2=1.0935, gamma3=GAMMA_3)
 BAO_PARAMS = dict(H0=72.66, rd=132.3, gamma_M=(2.246, 2.115),
                   gamma_H=(1.415, 0.303), z_split=1.0, width=0.15)
 
-#: CMB fit (Section 6.7), chi2 = 1464.7 for N = 836.  These are the
-#: full-precision posterior medians of the archived chain; Table 2 of the paper
-#: quotes them rounded, and using the rounded values shifts chi2 by about 6.
-CMB_PARAMS = dict(A_pk=5833516.72147, H0=73.2797692512, A0_low=5707.00685633,
-                  A0_high=1124.04729544, n_low=2.60280300671,
-                  n_mid=4.07294068848, n_high=3.80628782382,
-                  k_omega=0.0598640766311, k_break=1.44217088291,
-                  p=3.09080113032, q=17.1856208413, tau2=165.604994603)
+#: CMB fit (Section 6.7), chi2 = 1464.5 for N = 836, thirteen parameters
+#: including the cutoff exponent beta of Eq. (108).
+CMB_PARAMS = dict(A_pk=5.8245e6, H0=73.048, A0_low=5911.0, A0_high=1124.0,
+                  n_low=2.6091, n_mid=4.0714, n_high=3.8059,
+                  k_omega=0.059745, k_break=1.4397, p=3.0874, q=17.173,
+                  tau2=164.05, beta=5.81)
 
 #: DESI DR2 BAO measurements (Section 7.2).
 #: columns: z, observable (1 = D_M/r_d, 2 = D_H/r_d, 0 = D_V/r_d), value, sigma
@@ -86,11 +84,11 @@ DESI_DR2 = np.array([
 
 
 # --------------------------------------------------------------------------
-# Geometry: Eq. (86) and Eqs. (83)-(85)
+# Geometry: gamma(z), D_prop, C(r) and D_L  (Section 3)
 # --------------------------------------------------------------------------
 
 def gamma_of_z(z, g1=GAMMA_1, g2=GAMMA_2, g3=GAMMA_3):
-    """Three-segment exponent gamma(z), Eq. (86)."""
+    """Three-segment exponent gamma(z), Eq. (90)."""
     z = np.atleast_1d(np.asarray(z, dtype=float))
     return (g1 + (g2 - g1) * 0.5 * (1.0 + np.tanh((z - Z1) / DZ1))
             + (g3 - g2) * 0.5 * (1.0 + np.tanh((z - Z2) / DZ2)))
@@ -111,7 +109,7 @@ def z_of_x(x):
 
 
 def d_prop_of_z(z, H0, nx=20000):
-    """Light-travel distance D_prop = (c/H0) int dx/u, Eq. (78).  [Mpc]"""
+    """Light-travel distance D_prop = (c/H0) int dx/u, Eq. (79).  [Mpc]"""
     z = np.atleast_1d(np.asarray(z, dtype=float))
     xg = np.linspace(0.0, MAX_X * 0.99999, nx)
     ug = np.clip(1.0 - 2.0 * np.sinh(xg), 1e-30, None)
@@ -120,24 +118,24 @@ def d_prop_of_z(z, H0, nx=20000):
 
 
 def C_of_z(z, H0, g1=GAMMA_1, g2=GAMMA_2, g3=GAMMA_3):
-    """Areal radius C(r), Eq. (84).  [Mpc]"""
+    """Areal radius C(r), Eq. (86).  [Mpc]"""
     z = np.atleast_1d(np.asarray(z, dtype=float))
     return (1.0 + z) ** (gamma_of_z(z, g1, g2, g3) - 2.0) * d_prop_of_z(z, H0)
 
 
 def D_L_of_z(z, H0, g1=GAMMA_1, g2=GAMMA_2, g3=GAMMA_3):
-    """Luminosity distance D_L = (1+z)^gamma D_prop, Eq. (85).  [Mpc]"""
+    """Luminosity distance D_L = (1+z)^gamma D_prop, Eq. (89).  [Mpc]"""
     z = np.atleast_1d(np.asarray(z, dtype=float))
     return (1.0 + z) ** gamma_of_z(z, g1, g2, g3) * d_prop_of_z(z, H0)
 
 
 def mu_of_z(z, H0, g1=GAMMA_1, g2=GAMMA_2, g3=GAMMA_3):
-    """Distance modulus, Eq. (82)."""
+    """Distance modulus, Eq. (84)."""
     return 5.0 * np.log10(D_L_of_z(z, H0, g1, g2, g3)) + 25.0
 
 
 def K_gamma(x_query, gamma_lo, gamma_hi, z_split=1.0, width=0.15, nx=4000):
-    """Cumulative path integral K_gamma(x) of Eq. (153).  [dimensionless]
+    """Cumulative path integral K_gamma(x) of Eq. (162).  [dimensionless]
 
     The exponent is gamma_lo below z_split and gamma_hi above it, joined by a
     tanh transition of the given width in ln z.
@@ -158,7 +156,7 @@ def K_gamma(x_query, gamma_lo, gamma_hi, z_split=1.0, width=0.15, nx=4000):
 
 def sn_chi2(data_file, params=None, z_col="zHD", mu_col="MU_SH0ES",
             err_col="MU_SH0ES_ERR_DIAG"):
-    """chi^2 of the SN Ia Hubble diagram, Eq. (90).
+    """chi^2 of the SN Ia Hubble diagram, Eq. (94).
 
     `data_file` is the Pantheon+SH0ES catalogue (not redistributed here; see
     README.md for the download instructions).
@@ -201,7 +199,7 @@ def bao_model(z, params=None):
 
 
 def bao_chi2(params=None, data=None):
-    """chi^2 of the BAO measurements, Eq. (156), diagonal uncertainties."""
+    """chi^2 of the BAO measurements, Eq. (166), diagonal uncertainties."""
     p = params or BAO_PARAMS
     data = DESI_DR2 if data is None else data
     z, kind, val, sig = data[:, 0], data[:, 1].astype(int), data[:, 2], data[:, 3]
@@ -210,6 +208,26 @@ def bao_chi2(params=None, data=None):
                     np.cbrt(z * DM ** 2 * DH)))
     return float(np.sum(((val - pred) / sig) ** 2)), len(z)
 
+
+
+# --------------------------------------------------------------------------
+# Metric-perturbation kernel (Appendix B)
+# --------------------------------------------------------------------------
+
+def metric_kernel(xg, ug, a0, beta=5.81, use_cut=True):
+    """W_met(x), Eq. (B28) of the paper, in the same units as W_em.
+
+        W_met(x) = -x^2 int_x^{x_h} K(x') dx' / int_0^{x_h} g1^2 dx'
+        K(x)     = 2 g1^2 G/(g1 x) [4 pi rho_c + 8 pi A0 rho_c sinh x]
+                 = 3 g1 (1 + 2 A0 f sinh x)/x        (units H0 = 1)
+    """
+    g1 = np.sqrt(np.clip(ug, 1e-30, None))
+    fac = (np.clip(1.0 - (np.clip(xg, 0.0, MAX_X) / MAX_X) ** beta, 0.0, None)
+           if use_cut else 1.0)
+    K = 3.0 * g1 * (1.0 + 2.0 * a0 * fac * np.sinh(xg)) / np.maximum(xg, 1e-12)
+    IK = integrate.cumulative_trapezoid(K, xg, initial=0.0)
+    D = integrate.trapezoid(ug, xg)
+    return -xg ** 2 * (IK[-1] - IK) / D
 
 # --------------------------------------------------------------------------
 # CMB (Section 6)
@@ -234,7 +252,7 @@ def build_geometry(nx=4000, gamma_fn=gamma_of_z):
 
 
 def emission_kernel(xg, ug, x_star, p, q, tau2):
-    """Emission kernel W(x), Eq. (142).
+    """Emission kernel W(x), Eq. (148).
 
     tau is normalised at x_*, the radius at which z = 2, so that
     tau(x_*) = tau2 and the optical depth grows towards the horizon.
@@ -256,14 +274,40 @@ def n_of_k(k, n_low, n_mid, n_high, k_omega, sigma=0.30):
     return n_low + (n_mid - n_low) * t1 + (n_high - n_mid) * t2
 
 
-def power_spectrum(k, p):
-    """Matter power spectrum P(k), Eq. (124) of the paper.  [Mpc^3]"""
+def cutoff_volume(x):
+    """f(x) = 1 - (x/x_h)^3: the local quantum potential is switched off as the
+    volume of the perturbation approaches that of the causal horizon, so that
+    the metric of a local system rejoins the cosmological metric at infinity."""
+    return np.clip(1.0 - (np.asarray(x, dtype=float) / MAX_X) ** 3, 0.0, None)
+
+
+def cutoff_none(x):
+    return np.ones_like(np.asarray(x, dtype=float))
+
+
+def cutoff_horizon(x, beta=None):
+    """f(x) = 1 - (x/x_h)^beta, Eq. (108) of the paper."""
+    b = 5.81 if beta is None else beta
+    return np.clip(1.0 - (np.clip(np.asarray(x, dtype=float), 0.0, MAX_X) / MAX_X) ** b,
+                   0.0, None)
+
+
+def power_spectrum(k, p, cutoff=None):
+    """Matter power spectrum P(k), Eq. (131) of the paper.  [Mpc^3]
+
+    `cutoff` is an optional callable f(x) multiplying A_0.  The default (None)
+    reproduces the fit with a constant A_0, which is what Section 6.7 of the
+    paper reports as the no-cutoff comparison; pass `cutoff_horizon` to
+    include the horizon cutoff with the fitted beta.
+    """
     k = np.maximum(np.asarray(k, dtype=float), 1e-30)
     nk = n_of_k(k, p["n_low"], p["n_mid"], p["n_high"], p["k_omega"])
     cos2 = np.cos(k / p["k_omega"]) ** 2
     x_of_k = p["H0"] / (np.maximum(k, p["H0"] / (0.481 * C_LIGHT)) * C_LIGHT)
     a_t = 0.5 * (1.0 + np.tanh((np.log(k) - np.log(p["k_omega"])) / 0.30))
     A0k = p["A0_low"] + (p["A0_high"] - p["A0_low"]) * a_t
+    if cutoff is not None:
+        A0k = A0k * cutoff(x_of_k)
     om2 = np.maximum(2.0 * A0k * np.sinh(np.clip(x_of_k, 0.0, 20.0)) - 1.0, 0.05)
     P_low = p["A_pk"] * k ** (-nk) / np.sqrt(om2) * cos2
     return np.where(k < p["k_break"], P_low,
@@ -271,7 +315,7 @@ def power_spectrum(k, p):
 
 
 class CMBProjector:
-    """Two-branch projection of Eq. (149)-(150) on the Planck multipoles."""
+    """Two-branch projection of Eq. (156)-(150) on the Planck multipoles."""
 
     def __init__(self, data_file, nu=900, nk=300, ell_subsample=3,
                  ell_max=2508.0, nx=4000, nproc=1):
@@ -288,7 +332,7 @@ class CMBProjector:
         self.CMAX = self.CX[self.I]
         self.x_star = float(np.interp(2.0, self.ZG, self.XG))
 
-        # uniform grid in the areal radius u, Eq. (150)
+        # uniform grid in the areal radius u, Eq. (158)
         self.U = np.linspace(0.0, self.CMAX * 0.9997, self.nu)
         # Branch 1: C increases from 0 to Cmax.  Branch 2: C decreases from
         # Cmax back to 0, and is tabulated in reverse so that the abscissa is
@@ -320,26 +364,29 @@ class CMBProjector:
         else:
             self._jl = rows(np.asarray(self.ells)).astype(np.float32)
 
-    def G_of_u(self, p):
-        """Two-branch kernel G(u), Eq. (150)."""
+    def G_of_u(self, p, with_metric=False, a0_met=None):
+        """Two-branch kernel G(u), Eq. (158).  Optionally adds W_met."""
         W = emission_kernel(self.XG, self.UG, self.x_star, p["p"], p["q"], p["tau2"])
+        if with_metric:
+            a0m = p["A0_low"] if a0_met is None else a0_met
+            W = W + metric_kernel(self.XG, self.UG, a0m, p.get("beta", 5.81))
         G = np.interp(self.XA, self.XG, W) / self.DA + np.interp(self.XB, self.XG, W) / self.DB
         s = np.sum(G * self.DU)
         return None if (not np.isfinite(s) or s <= 0) else G / s
 
-    def Dl_model(self, p):
+    def Dl_model(self, p, cutoff=None, with_metric=False, a0_met=None):
         """D_ell = l(l+1)C_l/2pi of the model.  [muK^2]"""
         if self._jl is None:
             self.build_bessel()
-        G = self.G_of_u(p)
+        G = self.G_of_u(p, with_metric=with_metric, a0_met=a0_met)
         k_phys = self.KPG * (p["H0"] / C_LIGHT)
-        Pk = power_spectrum(k_phys, p)
+        Pk = power_spectrum(k_phys, p, cutoff=cutoff)
         pref = (p["H0"] / C_LIGHT) ** 3 * self.KPG ** 2 * Pk
         win = np.tensordot(self._jl, (G * self.DU).astype(np.float32), axes=([2], [0]))
         integ = pref[None, :] * win.astype(np.float64) ** 2
         Cl = (2.0 / np.pi) * np.sum(integ * np.gradient(self.KPG)[None, :], axis=1)
         return self.ells * (self.ells + 1) / (2.0 * np.pi) * Cl
 
-    def chi2(self, p):
-        model = self.Dl_model(p)
+    def chi2(self, p, cutoff=None, with_metric=False, a0_met=None):
+        model = self.Dl_model(p, cutoff=cutoff, with_metric=with_metric, a0_met=a0_met)
         return float(np.sum(((self.Dl - model) / self.err) ** 2)), len(self.ells)
